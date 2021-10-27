@@ -17,12 +17,21 @@ redis_info = redis.Redis.from_url(CELERY_RESULT_BACKEND)
 
 @router.get('/api/dogs', response_model=List[Dog])
 async def read_dogs():
+    """
+    Read all the dogs stored in database.
+    :return: return a list of dogs
+    """
     query = dogs.select()
     return await database.fetch_all(query=query)
 
 
 @router.get('/api/dogs/{name}')
 async def read_dog(name: str):
+    """
+    Read dog by name.
+    :param name: name of the dog
+    :return: dog
+    """
     query = dogs.select().where(name == dogs.c.name)
     dog = await database.fetch_one(query=query)
     if not dog:
@@ -32,6 +41,10 @@ async def read_dog(name: str):
 
 @router.get('/api/dogs/is_adopted/')
 async def read_dog():
+    """
+    Read all adopted dogs.
+    :return: list of adopted dogs
+    """
     is_adopted = True
     query = dogs.select().where(is_adopted == dogs.c.is_adopted)
     return await database.fetch_all(query=query)
@@ -39,11 +52,23 @@ async def read_dog():
 
 @router.get("/api/status/{name}")
 async def status(name: str):
+    """
+    Get status of tasks.
+    :param name: name of the task
+    :return: task information
+    """
     return redis_info.get(name)
 
 
 @router.post('/api/dogs/{name}')
 async def create_dog(name: str, payload: DogSchema, token: Token = Depends(token_auth_scheme)):
+    """
+    Create dog.
+    :param name: dog name
+    :param payload: dog information
+    :param token: authentication token
+    :return: dog information
+    """
     user = await get_current_user(token.credentials)
     if not user:
         raise HTTPException(
@@ -76,6 +101,12 @@ async def create_dog(name: str, payload: DogSchema, token: Token = Depends(token
 
 @router.put('/api/dogs/{name}')
 async def update_dog(name: str, payload: DogSchema):
+    """
+    Update dog by name.
+    :param name: dog name
+    :param payload: Dog information
+    :return: dog
+    """
     query = dogs.select().where(name == dogs.c.name)
     dog = await database.fetch_one(query=query)
     if not dog:
@@ -96,6 +127,11 @@ async def update_dog(name: str, payload: DogSchema):
 
 @router.delete('/api/dogs/{name}')
 async def delete_dog(name: str):
+    """
+    Delete user.
+    :param name: dog name
+    :return: dictionary with dog name and a message of dog deletion
+    """
     query = dogs.select().where(name == dogs.c.name)
     dog = await database.fetch_one(query=query)
     if not dog:

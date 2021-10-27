@@ -8,6 +8,12 @@ router = APIRouter()
 
 @router.post("/api/token", response_model=Token)
 async def login_for_access_token(email: str = Form(...), password: str = Form(...)):
+    """
+    Login to get access token.
+    :param email: user email
+    :param password: user password
+    :return: dictionary containing scheme and access token
+    """
     user = await authenticate_user(email, password)
     if not user:
         raise HTTPException(

@@ -2,6 +2,7 @@ import databases
 import sqlalchemy
 from config.settings import DATABASE_URL
 
+
 database = databases.Database(DATABASE_URL)
 print(DATABASE_URL)
 metadata = sqlalchemy.MetaData()

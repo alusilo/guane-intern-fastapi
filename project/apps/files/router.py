@@ -10,6 +10,11 @@ router = APIRouter()
 
 @router.post('/api/uploadfile')
 async def create_upload_file(file: UploadFile = File(...)):
+    """
+    Upload file to an external endpoint.
+    :param file: file to be uploaded
+    :return: return filename.
+    """
     m = MultipartEncoder(fields={'file': (file.filename, file.file, file.content_type)})
     file_response = await client.post(UPLOAD_TO, data=m.to_string(), headers={'Content-Type': m.content_type})
     return file_response.json()

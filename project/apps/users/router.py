@@ -8,13 +8,22 @@ router = APIRouter()
 
 
 @router.get('/api/users', response_model=List[User])
-async def read_user():
+async def read_users():
+    """
+    Read all the users stored in database.
+    :return: return a list of users
+    """
     query = users.select()
     return await database.fetch_all(query=query)
 
 
 @router.get('/api/users/{user_id}', response_model=User)
-async def read_dog(user_id: int):
+async def read_user(user_id: int):
+    """
+    Read user by id.
+    :param user_id: ID of the user
+    :return: user
+    """
     query = users.select().where(user_id == users.c.id)
     user = await database.fetch_one(query=query)
     if not user:
@@ -24,6 +33,11 @@ async def read_dog(user_id: int):
 
 @router.post('/api/signup')
 async def create_user(user: UserSignUpForm):
+    """
+    Create user.
+    :param user: user to be created
+    :return: a dictionary containing user_id and user_email
+    """
     query = users.select().where(user.email == users.c.email)
     user_exists = await database.execute(query=query)
     if user_exists:
@@ -39,7 +53,13 @@ async def create_user(user: UserSignUpForm):
 
 
 @router.put('/api/users/{user_id}', response_model=User)
-async def update_dog(user_id: int, payload: UserSchema):
+async def update_user(user_id: int, payload: UserSchema):
+    """
+    Update user by id.
+    :param user_id: user ID
+    :param payload: User information
+    :return: user
+    """
     query = users.select().where(user_id == users.c.id)
     user = await database.fetch_one(query=query)
     if not user:
@@ -61,7 +81,12 @@ async def update_dog(user_id: int, payload: UserSchema):
 
 
 @router.delete('/api/users/{user_id}')
-async def delete_dog(user_id: int):
+async def delete_user(user_id: int):
+    """
+    Delete user.
+    :param user_id: user ID
+    :return: dictionary with user ID and a message of user deletion
+    """
     query = users.select().where(user_id == users.c.id)
     user = await database.fetch_one(query=query)
     if not user:

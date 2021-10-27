@@ -12,14 +12,22 @@ app = FastAPI()
 
 @app.on_event('startup')
 async def startup():
+    """
+    API startup.
+    :return: None
+    """
     await database.connect()
 
 
 @app.on_event('shutdown')
 async def shutdown():
+    """
+    API shutdown.
+    :return:
+    """
     await database.disconnect()
 
-
+# Here are added all the routers for each app
 app.include_router(dog_router.router)
 app.include_router(user_router.router)
 app.include_router(auth_router.router)

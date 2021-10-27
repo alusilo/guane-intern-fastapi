@@ -11,5 +11,11 @@ celery.conf.result_backend = CELERY_RESULT_BACKEND
 
 @celery.task
 def move_to_next_stage(name, stage):
+    """
+    Move task to a next stage.
+    :param name: name of the task
+    :param stage: stage of the task
+    :return: stage
+    """
     redis_info.set(name, stage)
     return stage
