@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    container_name: guane-rabbitmq
+    build: ./rabbitmq
+    volumes:
+      - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - "5672:5672"
+  redis:
+    container_name: guane-redis
+    build: ./redis
+    ports:
+      - "6379:6379"
+  web:
+    container_name: guane-web
+    build: ./project
+    restart: always
+    ports:
+      - "8000:8000"
+    command: uvicorn main:app --host 0.0.0.0 --reload
+    volumes:
+      - ./project:/usr/src/app
+    depends_on:
+      - db
+      - redis
+    links:
+      - db
+      - redis
+  db:
+    container_name: guane-db
+    build: ./db
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db:/var/lib/postgresql
+  worker:
+    container_name: guane-celery-worker
+    build: ./project
+    command: celery worker -A worker --loglevel=info
+    volumes:
+      - ./project:/usr/src/app
+    depends_on:
+      - rabbitmq
+      - redis
